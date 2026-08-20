@@ -1,4 +1,12 @@
 (function(){
+  document.title='Quản lý sao vàng';
+  const eyebrow=document.querySelector('.top .eyebrow');
+  if(eyebrow)eyebrow.textContent='SAO VÀNG';
+  const heading=document.querySelector('.top h1');
+  if(heading)heading.textContent='Quản lý sao vàng';
+  const loginHeading=document.querySelector('#loginView h2');
+  if(loginHeading)loginHeading.textContent='Mở quản lý sao vàng';
+
   const MANAGER_API='https://dinqlgaveujdeyisgpty.supabase.co/functions/v1/saovang-manager-api';
   const TABLES={
     staff_active_shift:'sv_staff_active_shift',
