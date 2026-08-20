@@ -20,7 +20,14 @@
     s.dataset.svDebtEdit='1';
     document.head.appendChild(s);
   }
-  function boot(){removeOutsideHistory();loadInstantDelete();loadDebtEdit()}
+  function loadActiveCollapse(){
+    if(document.querySelector('script[data-sv-active-collapse]'))return;
+    const s=document.createElement('script');
+    s.src='./saovang-active-collapse.js?v=28';
+    s.dataset.svActiveCollapse='1';
+    document.head.appendChild(s);
+  }
+  function boot(){removeOutsideHistory();loadInstantDelete();loadDebtEdit();loadActiveCollapse()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
   else boot();
 })();
