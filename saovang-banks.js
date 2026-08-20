@@ -169,3 +169,99 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindBanks);else bindBanks();
 })();
+
+// Divide active-shift activity into separate revenue categories for easier checking.
+(function(){
+  const MANAGER_API='https://dinqlgaveujdeyisgpty.supabase.co/functions/v1/saovang-manager-api';
+  const byId=id=>document.getElementById(id);
+  const categories=[
+    {key:'transfer',totalKey:'transfer',label:'OCB'},
+    {key:'bidv',totalKey:'bidv',label:'BIDV'},
+    {key:'cash',totalKey:'cash',label:'Tiền mặt'},
+    {key:'courtRevenue',totalKey:'courtRevenue',label:'Doanh thu sân'},
+    {key:'waterRevenue',totalKey:'waterRevenue',label:'Doanh thu nước'}
+  ];
+
+  function addStyles(){
+    if(document.getElementById('svRevenueGroupStyle'))return;
+    const style=document.createElement('style');style.id='svRevenueGroupStyle';
+    style.textContent=`
+      .sv-revenue-groups{display:grid;gap:12px;margin-top:8px}
+      .sv-revenue-group{border:1px solid rgba(15,118,110,.18);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.72)}
+      .sv-revenue-group-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;background:rgba(15,118,110,.07)}
+      .sv-revenue-group-head span{font-weight:800}
+      .sv-revenue-group-head strong{font-size:17px}
+      .sv-revenue-group-body{display:grid}
+      .sv-revenue-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;border-top:1px solid rgba(15,118,110,.10)}
+      .sv-revenue-item:first-child{border-top:0}
+      .sv-revenue-item-main{min-width:0;display:grid;gap:2px}
+      .sv-revenue-item-main b{font-size:14px}
+      .sv-revenue-item-main small{opacity:.72}
+      .sv-revenue-empty{padding:10px 13px;opacity:.62;font-size:13px}
+      .sv-revenue-delete{white-space:nowrap}
+      .sv-revenue-note{font-size:12px;opacity:.66;padding:2px 2px 0}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function entryDetail(e){
+    const p=[];
+    if(Number(e?.transfer||0))p.push(`OCB ${money(e.transfer)}`);
+    if(Number(e?.bidv||0))p.push(`BIDV ${money(e.bidv)}`);
+    if(Number(e?.cash||0))p.push(`Tiền mặt ${money(e.cash)}`);
+    if(Number(e?.courtRevenue||0))p.push(`Sân ${money(e.courtRevenue)}`);
+    if(Number(e?.waterRevenue||0))p.push(`Nước ${money(e.waterRevenue)}`);
+    return p.join(' · ');
+  }
+
+  async function deleteEntry(id){
+    const e=(active?.entries||[]).find(x=>String(x.id)===String(id));
+    if(!e)return toast('Không tìm thấy khoản doanh thu');
+    if(!confirm(`Xóa lần nhập này?\n${entryDetail(e)}\n\nNếu lần nhập có nhiều mục, tất cả mục của lần nhập đó sẽ được xóa.`))return;
+    try{
+      let d;
+      if(typeof isOwner==='function'&&isOwner()){
+        const o=typeof owner==='function'?owner():null;
+        if(!o?.token)return toast('Không xác định được quyền của nhân viên trong ca');
+        d=await activeApi({action:'public_delete_entry',entryId:String(id),token:o.token});
+      }else{
+        const pin=prompt('Nhập PIN quản lý để xóa khoản trong ca');
+        if(pin===null)return;
+        if(!pin.trim())return toast('Chưa nhập PIN quản lý');
+        const r=await fetch(MANAGER_API,{method:'POST',headers:{'Content-Type':'application/json','x-manager-pin':pin.trim()},body:JSON.stringify({action:'delete_active_revenue',entryId:String(id)})});
+        d=await r.json().catch(()=>({}));
+        if(!r.ok)throw new Error(d.error||`Lỗi ${r.status}`);
+      }
+      active=rowToActive(d.active);renderActive();await refreshSummary();toast('Đã xóa lần nhập và cập nhật tổng');
+    }catch(err){toast(err.message||'Không xóa được doanh thu')}
+  }
+
+  function renderGroups(){
+    if(!active)return;
+    const list=byId('activeEntries'),empty=byId('activeEntriesEmpty');
+    if(!list)return;
+    addStyles();
+    const entries=Array.isArray(active.entries)?active.entries:[];
+    if(!entries.length){list.innerHTML='';if(empty)empty.classList.remove('hidden');return}
+    if(empty)empty.classList.add('hidden');
+    const totals=active.totals||{};
+    list.innerHTML=`<div class="sv-revenue-groups">${categories.map(c=>{
+      const items=entries.filter(e=>Number(e?.[c.key]||0)>0);
+      const total=Number(totals?.[c.totalKey]||items.reduce((s,e)=>s+Number(e?.[c.key]||0),0));
+      return `<section class="sv-revenue-group">
+        <div class="sv-revenue-group-head"><span>${c.label}</span><strong>${money(total)}</strong></div>
+        <div class="sv-revenue-group-body">${items.length?items.map(e=>`<div class="sv-revenue-item">
+          <div class="sv-revenue-item-main"><b>${money(e[c.key])}</b><small>${esc(vnTime(e.at))} · ${esc(e.employee||active.employee)}</small></div>
+          <button class="btn danger mini sv-revenue-delete" type="button" data-sv-group-delete="${esc(e.id)}">Xóa lần nhập</button>
+        </div>`).join(''):`<div class="sv-revenue-empty">Chưa có khoản nào.</div>`}</div>
+      </section>`;
+    }).join('')}</div><div class="sv-revenue-note">Mỗi lần nhập được xếp vào đúng từng mục doanh thu. Nếu một lần nhập có nhiều mục, nút “Xóa lần nhập” sẽ xóa toàn bộ lần nhập đó.</div>`;
+    list.querySelectorAll('[data-sv-group-delete]').forEach(b=>b.onclick=()=>deleteEntry(b.dataset.svGroupDelete));
+  }
+
+  const previous=typeof renderActive==='function'?renderActive:null;
+  if(previous){
+    renderActive=function(){previous();renderGroups()};
+  }
+  if(active)renderActive();
+})();
