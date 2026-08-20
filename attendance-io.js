@@ -111,3 +111,11 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
+
+// Load Sao Vang bank-specific revenue tracking without changing the 971 branch.
+(function(){
+  const s=document.createElement('script');
+  s.src='./saovang-banks.js?v=19';
+  s.async=true;
+  document.head.appendChild(s);
+})();
