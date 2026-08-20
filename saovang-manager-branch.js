@@ -47,3 +47,10 @@
   };
   $('closeActiveBtn').onclick=closeActive;
 })();
+
+(function(){
+  const s=document.createElement('script');
+  s.src='./saovang-manager-banks.js?v=19';
+  s.async=true;
+  document.head.appendChild(s);
+})();
