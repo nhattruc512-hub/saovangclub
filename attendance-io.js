@@ -22,14 +22,46 @@
     if(exportBtn)exportBtn.style.display='none';
   }
 
+  function movePriorityCards(){
+    const main=document.querySelector('main.grid');
+    const revenue=document.getElementById('quickRevenueCard');
+    const debt=document.getElementById('debtSection');
+    if(main&&revenue&&debt){
+      const firstVisible=Array.from(main.children).find(el=>el.id!=='attendanceSection');
+      if(firstVisible){
+        main.insertBefore(debt,firstVisible);
+        main.insertBefore(revenue,debt);
+      }
+    }
+
+    const navWrap=document.querySelector('.quick-nav-in');
+    if(navWrap){
+      const revenueLink=navWrap.querySelector('a[href="#quickRevenueCard"]');
+      let debtLink=navWrap.querySelector('a[href="#debtSection"]');
+      const shiftLink=navWrap.querySelector('a[href="#shiftSection"]');
+      const managerLink=navWrap.querySelector('a[href="#managerSection"]');
+      if(!debtLink){
+        debtLink=document.createElement('a');
+        debtLink.href='#debtSection';
+        debtLink.textContent='Khách nợ';
+      }
+      if(revenueLink)navWrap.appendChild(revenueLink);
+      navWrap.appendChild(debtLink);
+      if(shiftLink)navWrap.appendChild(shiftLink);
+      if(managerLink)navWrap.appendChild(managerLink);
+    }
+  }
+
+  function applyLayout(){hideAttendanceUi();movePriorityCards()}
+
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',()=>{
-      hideAttendanceUi();
-      setTimeout(hideAttendanceUi,0);
-      setTimeout(hideAttendanceUi,300);
+      applyLayout();
+      setTimeout(applyLayout,0);
+      setTimeout(applyLayout,300);
     });
   }else{
-    hideAttendanceUi();
-    setTimeout(hideAttendanceUi,300);
+    applyLayout();
+    setTimeout(applyLayout,300);
   }
 })();
