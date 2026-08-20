@@ -52,7 +52,15 @@
     }
   }
 
-  function applyLayout(){hideAttendanceUi();movePriorityCards()}
+  function loadNoConfirmDelete(){
+    if(document.querySelector('script[data-sv-delete-no-confirm]'))return;
+    const s=document.createElement('script');
+    s.src='./saovang-delete-no-confirm.js?v=23';
+    s.dataset.svDeleteNoConfirm='1';
+    document.head.appendChild(s);
+  }
+
+  function applyLayout(){hideAttendanceUi();movePriorityCards();loadNoConfirmDelete()}
 
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',()=>{
