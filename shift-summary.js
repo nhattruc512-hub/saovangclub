@@ -1,3 +1,14 @@
+// Sao Vang branding.
+(function(){
+  document.title='Chấm công sao vàng';
+  const appleTitle=document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if(appleTitle)appleTitle.setAttribute('content','Chấm công sao vàng');
+  const eyebrow=document.querySelector('.hero .eyebrow');
+  if(eyebrow)eyebrow.textContent='SAO VÀNG';
+  const heading=document.querySelector('.hero h1');
+  if(heading)heading.textContent='Chấm công sao vàng';
+})();
+
 // Show a complete per-shift revenue closeout after a shift ends and in shift history.
 (function(){
   function fullShiftSummary(r){
