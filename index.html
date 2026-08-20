@@ -7,9 +7,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Chấm công sao vàng" />
   <title>Chấm công sao vàng</title>
-  <link rel="manifest" href="manifest.webmanifest?v=18" />
+  <link rel="manifest" href="manifest.webmanifest?v=19" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css?v=18" />
+  <link rel="stylesheet" href="styles.css?v=19" />
 </head>
 <body>
 <header class="hero">
@@ -70,7 +70,8 @@
   <section id="quickRevenueCard" class="card primary-card">
     <div class="head"><div><div class="kicker">DOANH THU</div><h2>Ghi nhận doanh thu</h2><p class="muted">Nhập nhanh các khoản phát sinh.</p></div><span id="revenueMode" class="badge">Đang kiểm tra</span></div>
     <div class="money-grid">
-      <label><span>Chuyển khoản</span><input id="qTransfer" class="input money" inputmode="numeric" placeholder="0"></label>
+      <label><span>OCB</span><input id="qTransfer" class="input money" inputmode="numeric" placeholder="0"></label>
+      <label><span>BIDV</span><input id="qBidv" class="input money" inputmode="numeric" placeholder="0"></label>
       <label><span>Tiền mặt</span><input id="qCash" class="input money" inputmode="numeric" placeholder="0"></label>
       <label><span>Doanh thu sân</span><input id="qCourt" class="input money" inputmode="numeric" placeholder="0"></label>
       <label><span>Doanh thu nước</span><input id="qWater" class="input money" inputmode="numeric" placeholder="0"></label>
@@ -80,7 +81,7 @@
 
   <section id="summarySection" class="card compact-card">
     <div class="head compact"><div><div class="kicker">TỔNG HỢP</div><h2>Doanh thu theo ngày</h2></div><input id="summaryDate" type="date" class="input date"></div>
-    <div class="summary-grid"><div><span>Chuyển khoản</span><b id="sumTransfer">0 ₫</b></div><div><span>Tiền mặt</span><b id="sumCash">0 ₫</b></div><div><span>Doanh thu sân</span><b id="sumCourt">0 ₫</b></div><div><span>Doanh thu nước</span><b id="sumWater">0 ₫</b></div></div>
+    <div class="summary-grid"><div><span>OCB</span><b id="sumTransfer">0 ₫</b></div><div><span>BIDV</span><b id="sumBidv">0 ₫</b></div><div><span>Tiền mặt</span><b id="sumCash">0 ₫</b></div><div><span>Doanh thu sân</span><b id="sumCourt">0 ₫</b></div><div><span>Doanh thu nước</span><b id="sumWater">0 ₫</b></div></div>
     <div class="grand"><span>Tổng doanh thu</span><strong id="sumRevenue">0 ₫</strong></div>
   </section>
 
@@ -95,7 +96,7 @@
     <div id="activeLockNotice" class="notice"></div>
     <div class="elapsed"><span>Thời gian đã làm</span><strong id="elapsed">00:00:00</strong></div>
     <div class="summary-grid">
-      <div><span>Chuyển khoản</span><b id="liveTransfer">0 ₫</b></div><div><span>Tiền mặt</span><b id="liveCash">0 ₫</b></div>
+      <div><span>OCB</span><b id="liveTransfer">0 ₫</b></div><div><span>BIDV</span><b id="liveBidv">0 ₫</b></div><div><span>Tiền mặt</span><b id="liveCash">0 ₫</b></div>
       <div><span>Doanh thu sân</span><b id="liveCourt">0 ₫</b></div><div><span>Doanh thu nước</span><b id="liveWater">0 ₫</b></div>
     </div>
     <div class="totals"><div><span>Tổng tiền thu</span><b id="liveCollected">0 ₫</b></div><div><span>Tổng doanh thu</span><b id="liveRevenue">0 ₫</b></div><div><span>Chênh lệch</span><b id="liveDiff">0 ₫</b></div></div>
@@ -121,13 +122,14 @@
   </section>
 </main>
 <div id="toast" class="toast"></div>
-<script src="app.js?v=18"></script>
-<script src="attendance-io.js?v=18"></script>
-<script src="revenue-delete.js?v=18"></script>
-<script src="manager-close.js?v=18"></script>
-<script src="shift-controls.js?v=18"></script>
-<script src="manager-export.js?v=18"></script>
-<script src="shift-summary.js?v=18"></script>
-<script src="saovang-branch.js?v=18"></script>
+<script src="app.js?v=19"></script>
+<script src="attendance-io.js?v=19"></script>
+<script src="revenue-delete.js?v=19"></script>
+<script src="manager-close.js?v=19"></script>
+<script src="shift-controls.js?v=19"></script>
+<script src="manager-export.js?v=19"></script>
+<script src="shift-summary.js?v=19"></script>
+<script src="saovang-branch.js?v=19"></script>
+<script src="saovang-banks.js?v=19" data-saovang-banks></script>
 </body>
 </html>
