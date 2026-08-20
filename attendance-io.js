@@ -120,6 +120,12 @@
     s.src='./saovang-banks.js?v=19';
     s.async=true;
     s.dataset.saovangBanks='1';
+    s.onload=()=>{
+      const summaryDate=document.getElementById('summaryDate');
+      if(summaryDate&&!summaryDate.dataset.bankBound){summaryDate.dataset.bankBound='1';summaryDate.addEventListener('change',()=>setTimeout(()=>{if(typeof refreshSummary==='function')refreshSummary()},0))}
+      const historyShift=document.getElementById('historyShift');
+      if(historyShift&&!historyShift.dataset.bankBound){historyShift.dataset.bankBound='1';historyShift.addEventListener('change',()=>setTimeout(()=>{if(typeof renderHistory==='function')renderHistory()},0))}
+    };
     document.head.appendChild(s);
   }
   if(document.readyState==='complete')loadBanks();
