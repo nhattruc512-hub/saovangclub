@@ -1,5 +1,5 @@
 // Attendance is hidden from the Sao Vang employee-facing page.
-// The legacy app still keeps its internal attendance hooks so other features remain stable.
+// Keep legacy attendance DOM available for app compatibility, but avoid repeated DOM work.
 (function(){
   const style=document.createElement('style');
   style.textContent=`
@@ -13,13 +13,9 @@
   function hideAttendanceUi(){
     const section=document.getElementById('attendanceSection');
     if(section){section.style.display='none';section.setAttribute('aria-hidden','true')}
-    const nav=document.querySelector('.quick-nav a[href="#attendanceSection"]');
-    if(nav){nav.style.display='none';nav.setAttribute('aria-hidden','true')}
     const managerList=document.getElementById('managerAttendanceList');
     const managerSection=managerList?.closest('.manager-section');
     if(managerSection)managerSection.style.display='none';
-    const exportBtn=document.getElementById('exportAttendanceBtn');
-    if(exportBtn)exportBtn.style.display='none';
   }
 
   function movePriorityCards(){
@@ -28,7 +24,7 @@
     const debt=document.getElementById('debtSection');
     if(main&&revenue&&debt){
       const firstVisible=Array.from(main.children).find(el=>el.id!=='attendanceSection');
-      if(firstVisible){
+      if(firstVisible&&firstVisible!==revenue){
         main.insertBefore(debt,firstVisible);
         main.insertBefore(revenue,debt);
       }
@@ -45,31 +41,11 @@
         debtLink.href='#debtSection';
         debtLink.textContent='Khách nợ';
       }
-      if(revenueLink)navWrap.appendChild(revenueLink);
-      navWrap.appendChild(debtLink);
-      if(shiftLink)navWrap.appendChild(shiftLink);
-      if(managerLink)navWrap.appendChild(managerLink);
+      [revenueLink,debtLink,shiftLink,managerLink].forEach(link=>{if(link)navWrap.appendChild(link)});
     }
   }
 
-  function loadNoConfirmDelete(){
-    if(document.querySelector('script[data-sv-delete-no-confirm]'))return;
-    const s=document.createElement('script');
-    s.src='./saovang-delete-no-confirm.js?v=23';
-    s.dataset.svDeleteNoConfirm='1';
-    document.head.appendChild(s);
-  }
-
-  function applyLayout(){hideAttendanceUi();movePriorityCards();loadNoConfirmDelete()}
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>{
-      applyLayout();
-      setTimeout(applyLayout,0);
-      setTimeout(applyLayout,300);
-    });
-  }else{
-    applyLayout();
-    setTimeout(applyLayout,300);
-  }
+  function boot(){hideAttendanceUi();movePriorityCards()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
