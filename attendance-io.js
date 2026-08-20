@@ -112,10 +112,16 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 
-// Load Sao Vang bank-specific revenue tracking without changing the 971 branch.
+// Load Sao Vang bank-specific revenue tracking after every app script has finished loading.
 (function(){
-  const s=document.createElement('script');
-  s.src='./saovang-banks.js?v=19';
-  s.async=true;
-  document.head.appendChild(s);
+  function loadBanks(){
+    if(document.querySelector('script[data-saovang-banks]'))return;
+    const s=document.createElement('script');
+    s.src='./saovang-banks.js?v=19';
+    s.async=true;
+    s.dataset.saovangBanks='1';
+    document.head.appendChild(s);
+  }
+  if(document.readyState==='complete')loadBanks();
+  else window.addEventListener('load',loadBanks,{once:true});
 })();
