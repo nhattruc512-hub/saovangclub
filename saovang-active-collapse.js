@@ -1,4 +1,4 @@
-// Sao Vang: add Thu gọn / Mở rộng control for active-shift activity.
+// Sao Vang: lightweight Thu gọn / Mở rộng control for active-shift activity.
 (function(){
   const byId=id=>document.getElementById(id);
   let collapsed=false;
@@ -31,30 +31,31 @@
     const list=byId('activeEntries');
     if(!list)return;
     const section=list.closest('.section-gap');
-    const kicker=section?.querySelector('.kicker');
-    if(!section||!kicker)return;
+    if(!section)return;
     addStyles();
 
-    if(!byId('svActiveCollapseBtn')){
+    let btn=byId('svActiveCollapseBtn');
+    if(!btn){
+      const kicker=section.querySelector(':scope > .kicker')||section.querySelector('.kicker');
+      if(!kicker)return;
       const head=document.createElement('div');
       head.className='sv-active-activity-head';
-      kicker.parentNode.insertBefore(head,kicker);
+      kicker.before(head);
       head.appendChild(kicker);
-      const btn=document.createElement('button');
+      btn=document.createElement('button');
       btn.id='svActiveCollapseBtn';
       btn.className='btn ghost mini';
       btn.type='button';
-      btn.onclick=()=>{collapsed=!collapsed;applyState()};
+      btn.addEventListener('click',()=>{
+        collapsed=!collapsed;
+        applyState();
+      });
       head.appendChild(btn);
     }
     applyState();
   }
 
-  const observer=new MutationObserver(()=>mount());
-  function boot(){
-    mount();
-    const card=byId('activeCard');
-    if(card)observer.observe(card,{childList:true,subtree:true});
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  function boot(){mount()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
