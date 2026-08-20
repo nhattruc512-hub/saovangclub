@@ -16,7 +16,7 @@
   function loadDebtEdit(){
     if(document.querySelector('script[data-sv-debt-edit]'))return;
     const s=document.createElement('script');
-    s.src='./saovang-debt-edit.js?v=26';
+    s.src='./saovang-debt-edit.js?v=27';
     s.dataset.svDebtEdit='1';
     document.head.appendChild(s);
   }
