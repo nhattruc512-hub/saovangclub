@@ -6,6 +6,14 @@
     const box=list?.closest('.section-gap');
     if(box)box.remove();
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeOutsideHistory);
-  else removeOutsideHistory();
+  function loadInstantDelete(){
+    if(document.querySelector('script[data-sv-no-confirm]'))return;
+    const s=document.createElement('script');
+    s.src='./saovang-delete-no-confirm.js?v=23';
+    s.dataset.svNoConfirm='1';
+    document.head.appendChild(s);
+  }
+  function boot(){removeOutsideHistory();loadInstantDelete()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+  else boot();
 })();
