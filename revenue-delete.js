@@ -13,7 +13,14 @@
     s.dataset.svNoConfirm='1';
     document.head.appendChild(s);
   }
-  function boot(){removeOutsideHistory();loadInstantDelete()}
+  function loadDebtEdit(){
+    if(document.querySelector('script[data-sv-debt-edit]'))return;
+    const s=document.createElement('script');
+    s.src='./saovang-debt-edit.js?v=26';
+    s.dataset.svDebtEdit='1';
+    document.head.appendChild(s);
+  }
+  function boot(){removeOutsideHistory();loadInstantDelete();loadDebtEdit()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
   else boot();
 })();
