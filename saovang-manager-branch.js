@@ -36,12 +36,17 @@
   closeActive=async function(){
     const id=$('closeActiveBtn').dataset.id;
     if(!id)return;
-    if(!confirm('Đóng ca đang hoạt động?'))return;
     try{
+      const rows=await rest(`staff_active_shift?select=id,edit_mode&singleton_id=eq.1&id=eq.${encodeURIComponent(id)}&limit=1`);
+      const editing=!!rows?.[0]?.edit_mode;
+      const message=editing
+        ?'Lưu toàn bộ chỉnh sửa của ca này và đóng chế độ chỉnh sửa?\n\nGiờ kết thúc cũ sẽ được giữ nguyên.'
+        :'Đóng ca đang hoạt động?';
+      if(!confirm(message))return;
       const r=await fetch(MANAGER_API,{method:'POST',headers:{'Content-Type':'application/json','x-manager-pin':pin},body:JSON.stringify({action:'close_active',id})});
       const d=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(d.error||'Không đóng được ca');
-      toast('Đã đóng ca');
+      toast(d.saved_edit?'Đã lưu chỉnh sửa và đóng ca':'Đã đóng ca');
       await refreshAll();
     }catch(e){toast(e.message||'Không đóng được ca')}
   };
