@@ -46,6 +46,22 @@
     }catch(e){toast(e.message||'Không đóng được ca')}
   };
   $('closeActiveBtn').onclick=closeActive;
+
+  deleteAudit=async function(id){
+    if(!id)return;
+    if(!confirm('Xóa nhật ký hoạt động này?'))return;
+    try{
+      await manager('delete_audit',id);
+      toast('Đã xóa nhật ký hoạt động');
+      await refreshAll();
+    }catch(e){toast(e.message||'Không xóa được nhật ký')}
+  };
+
+  renderAudit=function(rows){
+    $('auditEmpty').classList.toggle('hidden',rows.length>0);
+    $('auditList').innerHTML=rows.map(r=>`<div class="row"><div class="row-main"><b>${esc(r.description||r.action_type||'Hoạt động')}</b><span>${esc(r.employee||'')} ${r.shift_name?'· '+esc(r.shift_name):''}</span><small>${vnDate(r.created_at)} ${vnTime(r.created_at)}</small></div><div class="actions"><button class="btn danger" type="button" onclick="deleteAudit('${esc(r.id)}')">Xóa</button></div></div>`).join('');
+  };
+  window.deleteAudit=deleteAudit;
 })();
 
 (function(){
