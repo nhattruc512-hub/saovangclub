@@ -20,8 +20,9 @@
     loadScript('./saovang-active-collapse.js?v=29','data-sv-active-collapse');
     // Load after the main shift/history renderers are installed.
     setTimeout(()=>{
-      loadScript('./saovang-history-reopen.js?v=32','data-sv-history-reopen');
-      loadScript('./saovang-history-edit-actions.js?v=32','data-sv-history-edit-actions');
+      loadScript('./saovang-history-reopen.js?v=33','data-sv-history-reopen');
+      loadScript('./saovang-history-edit-actions.js?v=33','data-sv-history-edit-actions');
+      loadScript('./saovang-manager-edit-save.js?v=33','data-sv-manager-edit-save');
     },0);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
