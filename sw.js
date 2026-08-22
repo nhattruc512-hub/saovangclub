@@ -1,4 +1,4 @@
-const CACHE='saovang-checkin-v29';
+const CACHE='saovang-checkin-v30';
 const ASSETS=['./','./index.html','./styles.css?v=19','./app.js?v=19','./attendance-io.js?v=19','./revenue-delete.js?v=19','./manager-close.js?v=19','./shift-controls.js?v=19','./manager-export.js?v=19','./shift-summary.js?v=19','./saovang-branch.js?v=19','./saovang-banks.js?v=19','./saovang-delete-no-confirm.js?v=23','./saovang-debt-edit.js?v=27','./saovang-active-collapse.js?v=29','./manifest.webmanifest?v=19','./icon.svg'];
 
 self.addEventListener('install',event=>{
@@ -23,6 +23,18 @@ self.addEventListener('fetch',event=>{
         caches.open(CACHE).then(cache=>cache.put('./index.html',copy));
         return response;
       }).catch(()=>caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // Shift controls change often; bypass the browser HTTP cache so staff gets the latest behavior immediately.
+  if(url.pathname.endsWith('/shift-controls.js')){
+    event.respondWith(
+      fetch(event.request,{cache:'reload'}).then(response=>{
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+        return response;
+      }).catch(()=>caches.match(event.request))
     );
     return;
   }
