@@ -19,6 +19,8 @@
     const card=byId('summarySection');
     const title=card?.querySelector('.head h2');
     if(title)title.textContent='Doanh thu trong ca theo ngày';
+    const grandLabel=card?.querySelector('.grand span');
+    if(grandLabel)grandLabel.textContent='Tổng doanh thu sân + nước';
     if(card&&!byId('svShiftOnlySummaryNote')){
       const note=document.createElement('div');
       note.id='svShiftOnlySummaryNote';
@@ -26,6 +28,14 @@
       note.style.marginTop='8px';
       note.textContent='Chỉ tính các khoản thuộc ca; không cộng doanh thu ngoài ca.';
       card.querySelector('.head')?.insertAdjacentElement('afterend',note);
+    }
+    if(card&&!byId('svDailyReconcile')){
+      const box=document.createElement('div');
+      box.id='svDailyReconcile';
+      box.className='totals';
+      box.style.marginTop='10px';
+      box.innerHTML='<div><span>Tổng tiền thu</span><b id="sumCollectedDay">0 ₫</b></div><div><span>Chênh lệch</span><b id="sumDiffDay">0 ₫</b></div>';
+      card.appendChild(box);
     }
   }
 
@@ -63,22 +73,27 @@
         sum.water+=amount(totals.waterRevenue);
       }
 
+      const collected=sum.ocb+sum.bidv+sum.cash;
+      const revenue=sum.court+sum.water;
+      const difference=collected-revenue;
+
       show('sumTransfer',sum.ocb);
       show('sumBidv',sum.bidv);
       show('sumCash',sum.cash);
       show('sumCourt',sum.court);
       show('sumWater',sum.water);
-      show('sumRevenue',sum.court+sum.water);
+      show('sumRevenue',revenue);
+      show('sumCollectedDay',collected);
+      show('sumDiffDay',difference);
     }catch(err){
       console.error('Không tính được tổng doanh thu trong ca',err);
     }
   }
 
-  // Replace the branch summary function so all later refreshes use the shift-only formula.
+  // Replace all later refreshes with the shift-only formula.
   try{refreshSummary=refreshShiftOnlySummary}catch{}
   window.refreshSummary=refreshShiftOnlySummary;
 
-  // Block the legacy date-change handler, which included outside-shift entries.
   const dateInput=byId('summaryDate');
   if(dateInput&&!dateInput.dataset.svShiftOnlySummary){
     dateInput.dataset.svShiftOnlySummary='1';
@@ -88,8 +103,7 @@
     },true);
   }
 
-  // Recalculate after startup. The delayed passes only protect against an older async
-  // summary request that may already have started before this override was loaded.
+  // Recalculate after startup to win over any legacy request already in flight.
   refreshShiftOnlySummary();
   setTimeout(refreshShiftOnlySummary,300);
   setTimeout(refreshShiftOnlySummary,1200);
