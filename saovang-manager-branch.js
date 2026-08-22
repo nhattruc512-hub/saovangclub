@@ -71,7 +71,7 @@
 
 (function(){
   const s=document.createElement('script');
-  s.src='./saovang-manager-banks.js?v=19';
+  s.src='./saovang-manager-banks.js?v=34';
   s.async=true;
   document.head.appendChild(s);
 })();
