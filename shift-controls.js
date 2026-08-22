@@ -1,4 +1,5 @@
 // Up to two staff may join the same active shift. Other shifts stay locked.
+// The device that started/joined the active shift can also correct the shift without losing revenue.
 (function(){
   const ENDPOINT='https://dinqlgaveujdeyisgpty.supabase.co/functions/v1/manager-close-active-shift';
   const el=id=>document.getElementById(id);
@@ -70,6 +71,12 @@
       const grid=start.querySelector('.shift-grid');if(grid)start.insertBefore(n,grid);
     }
     const card=el('activeCard');
+    if(card&&!el('editActiveShiftBtn')){
+      const b=document.createElement('button');
+      b.id='editActiveShiftBtn';b.type='button';b.className='btn secondary block hidden';b.textContent='CHỈNH SỬA CA';
+      const finish=el('finishShiftBtn');if(finish)finish.before(b);else card.appendChild(b);
+      b.addEventListener('click',editActiveShift);
+    }
     if(card&&!el('managerPinCloseBtn')){
       const b=document.createElement('button');b.id='managerPinCloseBtn';b.type='button';b.className='btn danger block hidden';b.textContent='ĐÓNG CA BẰNG PIN QUẢN LÝ';
       const finish=el('finishShiftBtn');if(finish)finish.after(b);else card.appendChild(b);b.addEventListener('click',closeWithPin);
@@ -80,7 +87,7 @@
 
   function apply(){
     ensureUI();
-    const start=el('startCard'),notice=el('shiftBusyNotice'),pinBtn=el('managerPinCloseBtn'),finish=el('finishShiftBtn');
+    const start=el('startCard'),notice=el('shiftBusyNotice'),pinBtn=el('managerPinCloseBtn'),editBtn=el('editActiveShiftBtn'),finish=el('finishShiftBtn');
     if(start)start.classList.remove('hidden');
     const running=typeof active!=='undefined'&&!!active,count=participantCount();
     document.querySelectorAll('.shift').forEach(b=>{b.disabled=running&&(count>=2||b.dataset.shift!==active.shiftKey)});
@@ -88,7 +95,31 @@
     if(typeof updateStartButton==='function')updateStartButton();
     const own=running&&typeof isOwner==='function'&&isOwner();
     if(finish)finish.classList.toggle('hidden',!own);
+    if(editBtn)editBtn.classList.toggle('hidden',!own);
     if(pinBtn)pinBtn.classList.toggle('hidden',!running||own);
+  }
+
+  async function editActiveShift(){
+    if(typeof active==='undefined'||!active)return toast('Không có ca đang hoạt động');
+    if(typeof isOwner!=='function'||!isOwner())return toast('Chỉ máy đã bắt đầu ca mới được chỉnh sửa');
+    const currentNo=String(active.shiftKey||'').replace('ca','')||'1';
+    const raw=prompt(`Ca hiện tại: ${active.shiftName}\nNhập ca muốn đổi sang: 1, 2 hoặc 3`,currentNo);
+    if(raw===null)return;
+    const n=String(raw).trim();
+    const key=`ca${n}`;
+    if(!SHIFTS[key])return toast('Chỉ chọn Ca 1, Ca 2 hoặc Ca 3');
+    if(key===active.shiftKey)return toast('Ca không thay đổi');
+    const o=owner();
+    if(!o?.token)return toast('Không xác định được quyền chỉnh sửa ca');
+    const btn=el('editActiveShiftBtn');if(btn)btn.disabled=true;
+    try{
+      const d=await activeApi({action:'update',id:active.id,token:o.token,shiftKey:key});
+      active=rowToActive(d.active);
+      renderActive();
+      updateRevenueMode();
+      toast(`Đã đổi sang ${active.shiftName}. Doanh thu được giữ nguyên.`);
+    }catch(e){toast(e.message||'Không chỉnh sửa được ca')}
+    finally{if(btn)btn.disabled=false}
   }
 
   async function closeWithPin(){
@@ -100,13 +131,13 @@
     try{
       const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','x-manager-pin':pin.trim()},body:JSON.stringify({id:current.id})});
       const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||`Lỗi ${r.status}`);
-      localStorage.removeItem('r971_shared_shift_owner_v1');active=null;
+      if(typeof OWNER_KEY!=='undefined')localStorage.removeItem(OWNER_KEY);active=null;
       if(typeof refreshAll==='function')await refreshAll();if(typeof renderActive==='function')renderActive();apply();toast(`Đã đóng ${current.shiftName} bằng PIN quản lý`);
     }catch(e){toast(e.message||'Không đóng được ca')}finally{btn.disabled=false}
   }
 
   const oldRender=typeof renderActive==='function'?renderActive:null;
   if(oldRender){renderActive=function(){oldRender();apply()}}
-  function boot(){ensureUI();apply();setInterval(apply,1200)}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  function boot(){ensureUI();apply()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
