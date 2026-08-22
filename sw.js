@@ -1,5 +1,5 @@
-const CACHE='saovang-checkin-v31';
-const ASSETS=['./','./index.html','./styles.css?v=19','./app.js?v=19','./attendance-io.js?v=19','./revenue-delete.js?v=19','./manager-close.js?v=19','./shift-controls.js?v=19','./manager-export.js?v=19','./shift-summary.js?v=19','./saovang-branch.js?v=19','./saovang-banks.js?v=19','./saovang-delete-no-confirm.js?v=23','./saovang-debt-edit.js?v=27','./saovang-active-collapse.js?v=29','./saovang-history-reopen.js?v=31','./manifest.webmanifest?v=19','./icon.svg'];
+const CACHE='saovang-checkin-v32';
+const ASSETS=['./','./index.html','./styles.css?v=19','./app.js?v=19','./attendance-io.js?v=19','./revenue-delete.js?v=32','./manager-close.js?v=19','./shift-controls.js?v=32','./manager-export.js?v=19','./shift-summary.js?v=19','./saovang-branch.js?v=19','./saovang-banks.js?v=19','./saovang-delete-no-confirm.js?v=23','./saovang-debt-edit.js?v=27','./saovang-active-collapse.js?v=29','./saovang-history-reopen.js?v=32','./saovang-history-edit-actions.js?v=32','./manifest.webmanifest?v=19','./icon.svg'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
@@ -27,8 +27,8 @@ self.addEventListener('fetch',event=>{
     return;
   }
 
-  // These controls change often; bypass the browser HTTP cache for immediate updates.
-  if(url.pathname.endsWith('/shift-controls.js')||url.pathname.endsWith('/revenue-delete.js')||url.pathname.endsWith('/saovang-history-reopen.js')){
+  // These controls change often; bypass browser HTTP cache for immediate updates.
+  if(url.pathname.endsWith('/shift-controls.js')||url.pathname.endsWith('/revenue-delete.js')||url.pathname.endsWith('/saovang-history-reopen.js')||url.pathname.endsWith('/saovang-history-edit-actions.js')){
     event.respondWith(
       fetch(event.request,{cache:'reload'}).then(response=>{
         const copy=response.clone();
